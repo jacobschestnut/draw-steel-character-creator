@@ -1,101 +1,207 @@
-import Image from "next/image";
+'use client'
+
+import { useState, useEffect } from 'react';
+
+type Trait = {
+  id: number;
+  name: string;
+  value: number;
+  ancestry: string;
+};
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const ancestryList = ['Human', 'Devil', 'Elf', 'Orc'];
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const importedTraits = [
+    { id: 1, name: 'Detect The Supernatural', value: 2, ancestry: 'Human' },
+    { id: 2, name: 'Perseverance', value: 1, ancestry: 'Human' },
+    { id: 9, name: 'Leadership', value: 2, ancestry: 'Human' },
+    { id: 10, name: 'Enhanced Vision', value: 1, ancestry: 'Human' },
+    { id: 3, name: 'Barbed Tail', value: 2, ancestry: 'Devil' },
+    { id: 4, name: 'Silver Tongue', value: 1, ancestry: 'Devil' },
+    { id: 11, name: 'Infernal Charm', value: 2, ancestry: 'Devil' },
+    { id: 12, name: 'Night Vision', value: 1, ancestry: 'Devil' },
+    { id: 5, name: 'Forest Lore', value: 2, ancestry: 'Elf' },
+    { id: 6, name: 'Elven Agility', value: 1, ancestry: 'Elf' },
+    { id: 13, name: 'Nature’s Embrace', value: 2, ancestry: 'Elf' },
+    { id: 14, name: 'Arcane Knowledge', value: 1, ancestry: 'Elf' },
+    { id: 7, name: 'Savage Strength', value: 2, ancestry: 'Orc' },
+    { id: 8, name: 'Battle Fury', value: 1, ancestry: 'Orc' },
+    { id: 15, name: 'Ferocity', value: 2, ancestry: 'Orc' },
+    { id: 16, name: 'Toughness', value: 1, ancestry: 'Orc' },
+  ]
+
+  const sortTraits = (arr: Trait[]) => {
+    const groupedTraits: { [key: string]: Trait[] } = {};
+    arr.forEach((trait) => {
+      if (!groupedTraits[trait.ancestry]) groupedTraits[trait.ancestry] = [];
+      groupedTraits[trait.ancestry].push(trait);
+    });
+    return groupedTraits;
+  };
+
+  const traitOptions: { [key: string]: Trait[] } = sortTraits(importedTraits);
+
+  const [selectedAncestry, setSelectedAncestry] = useState('');
+  const [trait1, setTrait1] = useState<Trait | null>(null);
+  const [trait2, setTrait2] = useState<Trait | null>(null);
+  const [trait3, setTrait3] = useState<Trait | null>(null);
+  const [traits, setTraits] = useState<Trait[]>([]);
+
+  const showTrait3 = () => {
+    if (trait1 && trait2 && !trait3) {
+      if (traitValueTotal < 3) {
+        return true
+      }
+    }
+
+    if (trait1 && trait2 && trait3) {
+      if (traitValueTotal <= 3) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  const [selectedTraits, setSelectedTraits] = useState<Trait[]>([]);
+  const [traitValueTotal, setTraitValueTotal] = useState(0);
+
+  const handleAncestryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const ancestry = e.target.value;
+    setSelectedAncestry(ancestry);
+    setTraits(traitOptions[ancestry] || []);
+    setTrait1(null);
+    setTrait2(null);
+    setTrait3(null);
+  };
+
+  const populateTraitOptions = (traits: Trait[], num: number) => {
+    if (num == 2) {
+      return traits.filter((trait) => (
+        (trait.name !== trait1?.name)
+      ));
+    }
+
+    if (num == 3) {
+      return traits.filter((trait) => (
+        (trait.name !== trait1?.name) && (trait.name !== trait2?.name)
+      ));
+    }
+
+    return traits
+  };
+
+  const handleTraitChange = (e: React.ChangeEvent<HTMLSelectElement>, traitNumber: number) => {
+    const selectedTraitName = e.target.value;
+    const selectedTrait = traitOptions[selectedAncestry].find(
+      (trait) => trait.name === selectedTraitName
+    );
+    
+    if (selectedTrait) {
+      if (traitNumber === 1) {
+        setTrait1(selectedTrait);
+      } else if (traitNumber === 2) {
+        setTrait2(selectedTrait);
+      } else if (traitNumber === 3) {
+        setTrait3(selectedTrait);
+      }
+    }
+  };
+
+  useEffect(() => {
+    let updatedTraits = [trait1, trait2, trait3].filter(Boolean) as Trait[];
+    let value = 0;
+  
+    updatedTraits = updatedTraits.filter((trait, index) => {
+      value += trait.value;
+      if (value > 3) {
+        if (index === 1) setTrait2(null);
+        if (index === 2) setTrait3(null);
+        value -= trait.value;
+        return false; 
+      }
+      return true;
+    });
+  
+    setSelectedTraits(updatedTraits);
+    setTraitValueTotal(value);
+  }, [trait1, trait2, trait3]);
+  
+
+  return (
+    <div>
+      <div className="collapse collapse-arrow bg-base-200">
+        <input type="radio" name="my-accordion-2" defaultChecked />
+        <div className="collapse-title text-xl font-medium">Ancestry</div>
+        <div className="collapse-content">
+          <select
+            className="select select-bordered w-full max-w-xs"
+            value={selectedAncestry}
+            onChange={handleAncestryChange}
+            aria-label="Select ancestry"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <option value="" disabled>Select ancestry</option>
+            {ancestryList.map((ancestry) => (
+              <option key={ancestry} value={ancestry}>
+                {ancestry}
+              </option>
+            ))}
+          </select>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+      
+      <div className="collapse collapse-arrow bg-base-200">
+        <input type="radio" name="my-accordion-2" />
+        <div className="collapse-title text-xl font-medium">Traits</div>
+        <div className="collapse-content">
+          <select
+            className="select select-bordered w-full max-w-xs"
+            value={trait1?.name || ''}
+            aria-label="Select trait 1"
+            onChange={(e) => handleTraitChange(e, 1)}
+          >
+            <option value="" disabled>Select trait</option>
+            {populateTraitOptions(traits, 1).map((trait) => (
+              <option key={trait.id} value={trait.name}>
+                {trait.name} (Value: {trait.value})
+              </option>
+            ))}
+          </select>
+          
+          <select
+            className="select select-bordered w-full max-w-xs"
+            value={trait2?.name || ''}
+            aria-label="Select trait 2"
+            onChange={(e) => handleTraitChange(e, 2)}
+            style={{ display: trait1 ? 'block' : 'none' }}
+          >
+            <option value="" disabled>Select trait</option>
+            {populateTraitOptions(traits, 2).map((trait) => (
+              <option key={trait.id} value={trait.name}>
+                {trait.name} (Value: {trait.value})
+              </option>
+            ))}
+          </select>
+          
+          <select
+            className="select select-bordered w-full max-w-xs"
+            value={trait3?.name || ''}
+            aria-label="Select trait 3"
+            onChange={(e) => handleTraitChange(e, 3)}
+            style={{
+              display: showTrait3() ? 'block' : 'none'
+            }}
+          >
+            <option value="" disabled>Select trait</option>
+            {populateTraitOptions(traits, 3).map((trait) => (
+              <option key={trait.id} value={trait.name}>
+                {trait.name} (Value: {trait.value})
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
     </div>
   );
 }
