@@ -391,9 +391,9 @@ export default function Home() {
   
           <div>
             <div className="py-4 text-base font-medium">Environment</div>
-            <div className="grid grid-cols-2">
+            <div className="grid grid-cols-3 gap-4">
               <select
-                className="select select-bordered w-full max-w-xs"
+                className="select select-bordered w-full max-w-xs col-span-1"
                 value={environment?.name || ''}
                 aria-label="Select environment"
                 onChange={(e) => {
@@ -412,7 +412,7 @@ export default function Home() {
                   </option>
                 ))}
               </select>
-              <p className="text-sm flex items-center justify-center">
+              <p className="text-sm flex items-center justify-center col-span-2">
                 {environment ? environment.description : ''}
               </p>
             </div>
@@ -420,9 +420,9 @@ export default function Home() {
   
           <div>
             <div className="py-4 text-base font-medium">Organization</div>
-            <div className="grid grid-cols-2">
+            <div className="grid grid-cols-3 gap-4">
               <select
-                className="select select-bordered w-full max-w-xs"
+                className="select select-bordered w-full max-w-xs col-span-1"
                 value={organization?.name || ''}
                 aria-label="Select organization"
                 onChange={(e) => {
@@ -441,7 +441,7 @@ export default function Home() {
                   </option>
                 ))}
               </select>
-              <p className="text-sm flex items-center justify-center">
+              <p className="text-sm flex items-center justify-center col-span-2">
                 {organization ? organization.description : ''}
               </p>
             </div>
@@ -449,9 +449,9 @@ export default function Home() {
   
           <div>
             <div className="py-4 text-base font-medium">Upbringing</div>
-            <div className="grid grid-cols-2">
+            <div className="grid grid-cols-3 gap-4">
               <select
-                className="select select-bordered w-full max-w-xs"
+                className="select select-bordered w-full max-w-xs col-span-1"
                 value={upbringing?.name || ''}
                 aria-label="Select upbringing"
                 onChange={(e) => {
@@ -470,7 +470,7 @@ export default function Home() {
                   </option>
                 ))}
               </select>
-              <p className="text-sm flex items-center justify-center">
+              <p className="text-sm flex items-center justify-center col-span-2">
                 {upbringing ? upbringing.description : ''}
               </p>
             </div>
