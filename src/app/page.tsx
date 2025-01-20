@@ -283,13 +283,13 @@ export default function Home() {
   ];
 
   return (
-    <div>
+    <div className="flex flex-col items-center w-2/3">
       <div className="collapse collapse-arrow bg-base-200">
         <input type="radio" name="my-accordion-2" defaultChecked />
         <div className="collapse-title text-xl font-medium">Ancestry</div>
-        <div className="collapse-content">
+        <div className="bg-slate-800 collapse-content">
           <select
-            className="select select-bordered w-full max-w-xs"
+            className="mt-4 select select-bordered w-full max-w-xs"
             value={selectedAncestry}
             onChange={handleAncestryChange}
             aria-label="Select ancestry"
@@ -303,9 +303,9 @@ export default function Home() {
               </option>
             ))}
           </select>
-
-          <div className='pt-2'>
-            <div className="py-4 text-l font-medium">Traits</div>
+  
+          <div>
+            <div className="py-4 text-base font-medium">Traits</div>
             <select
               className="select select-bordered w-full max-w-xs"
               value={trait1?.name || ''}
@@ -321,7 +321,7 @@ export default function Home() {
                 </option>
               ))}
             </select>
-
+  
             <select
               className="select select-bordered w-full max-w-xs"
               value={trait2?.name || ''}
@@ -338,7 +338,7 @@ export default function Home() {
                 </option>
               ))}
             </select>
-
+  
             <select
               className="select select-bordered w-full max-w-xs"
               value={trait3?.name || ''}
@@ -360,13 +360,13 @@ export default function Home() {
           </div>
         </div>
       </div>
-
+  
       <div className="collapse collapse-arrow bg-base-200">
         <input type="radio" name="my-accordion-2" />
         <div className="collapse-title text-xl font-medium">Culture</div>
-        <div className="collapse-content">
-        <div className='pt-2'>
-            <div className="py-4 text-l font-medium">Language</div>
+        <div className="bg-slate-800 collapse-content">
+          <div>
+            <div className="py-4 text-base font-medium">Language</div>
             <select
               className="select select-bordered w-full max-w-xs"
               value={language?.name || ''}
@@ -388,89 +388,95 @@ export default function Home() {
               ))}
             </select>
           </div>
-
-          <div className='pt-2'>
-            <div className="py-4 text-l font-medium">Environment</div>
-            <select
-              className="select select-bordered w-full max-w-xs"
-              value={environment?.name || ''}
-              aria-label="Select environment"
-              onChange={(e) => {
-                const selectedEnvironment = environments.find(
-                  (environment) => environment.name === e.target.value
-                );
-                setEnvironment(selectedEnvironment || null);
-              }}
-            >
-              <option value="" disabled>
-                Select environment
-              </option>
-              {environments.map((environment) => (
-                <option key={environment.id} value={environment.name}>
-                  {environment.name}
+  
+          <div>
+            <div className="py-4 text-base font-medium">Environment</div>
+            <div className="grid grid-cols-2">
+              <select
+                className="select select-bordered w-full max-w-xs"
+                value={environment?.name || ''}
+                aria-label="Select environment"
+                onChange={(e) => {
+                  const selectedEnvironment = environments.find(
+                    (environment) => environment.name === e.target.value
+                  );
+                  setEnvironment(selectedEnvironment || null);
+                }}
+              >
+                <option value="" disabled>
+                  Select environment
                 </option>
-              ))}
-            </select>
-            <p className='w-1/3 py-2'>
-              {environment ? environment.description : ''}
-            </p>
+                {environments.map((environment) => (
+                  <option key={environment.id} value={environment.name}>
+                    {environment.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-sm flex items-center justify-center">
+                {environment ? environment.description : ''}
+              </p>
+            </div>
           </div>
-
-          <div className='pt-2'>
-            <div className="py-4 text-l font-medium">Organization</div>
-            <select
-              className="select select-bordered w-full max-w-xs"
-              value={organization?.name || ''}
-              aria-label="Select organization"
-              onChange={(e) => {
-                const selectedOrganization = organizations.find(
-                  (organization) => organization.name === e.target.value
-                );
-                setOrganization(selectedOrganization || null);
-              }}
-            >
-              <option value="" disabled>
-                Select organization
-              </option>
-              {organizations.map((organization) => (
-                <option key={organization.id} value={organization.name}>
-                  {organization.name}
+  
+          <div>
+            <div className="py-4 text-base font-medium">Organization</div>
+            <div className="grid grid-cols-2">
+              <select
+                className="select select-bordered w-full max-w-xs"
+                value={organization?.name || ''}
+                aria-label="Select organization"
+                onChange={(e) => {
+                  const selectedOrganization = organizations.find(
+                    (organization) => organization.name === e.target.value
+                  );
+                  setOrganization(selectedOrganization || null);
+                }}
+              >
+                <option value="" disabled>
+                  Select organization
                 </option>
-              ))}
-            </select>
-            <p className='w-1/3 py-2'>
-              {organization ? organization.description : ''}
-            </p>
+                {organizations.map((organization) => (
+                  <option key={organization.id} value={organization.name}>
+                    {organization.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-sm flex items-center justify-center">
+                {organization ? organization.description : ''}
+              </p>
+            </div>
           </div>
-
-          <div className='pt-2'>
-            <div className="py-4 text-l font-medium">Upbringing</div>
-            <select
-              className="select select-bordered w-full max-w-xs"
-              value={upbringing?.name || ''}
-              aria-label="Select upbringing"
-              onChange={(e) => {
-                const selectedUpbringing = upbringings.find(
-                  (upbringing) => upbringing.name === e.target.value
-                );
-                setUpbringing(selectedUpbringing || null);
-              }}
-            >
-              <option value="" disabled>
-                Select upbringing
-              </option>
-              {upbringings.map((upbringing) => (
-                <option key={upbringing.id} value={upbringing.name}>
-                  {upbringing.name}
+  
+          <div>
+            <div className="py-4 text-base font-medium">Upbringing</div>
+            <div className="grid grid-cols-2">
+              <select
+                className="select select-bordered w-full max-w-xs"
+                value={upbringing?.name || ''}
+                aria-label="Select upbringing"
+                onChange={(e) => {
+                  const selectedUpbringing = upbringings.find(
+                    (upbringing) => upbringing.name === e.target.value
+                  );
+                  setUpbringing(selectedUpbringing || null);
+                }}
+              >
+                <option value="" disabled>
+                  Select upbringing
                 </option>
-              ))}
-            </select>
-            <p className='w-1/3 py-2'>
-              {upbringing ? upbringing.description : ''}
-            </p>
+                {upbringings.map((upbringing) => (
+                  <option key={upbringing.id} value={upbringing.name}>
+                    {upbringing.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-sm flex items-center justify-center">
+                {upbringing ? upbringing.description : ''}
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  );  
 }
