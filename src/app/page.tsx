@@ -1,6 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import HumanPage from './components/ancestry_forms/human';
+
+// type Ancestry = {
+//   id: number;
+//   name: string;
+//   description: string;
+// }
 
 type Trait = {
   id: number;
@@ -36,7 +43,7 @@ type Upbringing = {
 };
 
 export default function Home() {
-  const ancestryList = ['Human', 'Devil', 'Elf', 'Orc'];
+  const ancestryList = ['Devil', 'Dragon Knight', 'Dwarf', 'Wode Elf', 'High Elf', 'Hakaan', 'Human', 'Memonek', 'Orc', 'Polder', 'Revenant', 'Time Raider'];
 
   const importedTraits = [
     { id: 1, name: 'Detect The Supernatural', value: 2, ancestry: 'Human' },
@@ -69,83 +76,92 @@ export default function Home() {
   const traitOptions: { [key: string]: Trait[] } = sortTraits(importedTraits);
 
   const [selectedAncestry, setSelectedAncestry] = useState('');
-  const [trait1, setTrait1] = useState<Trait | null>(null);
-  const [trait2, setTrait2] = useState<Trait | null>(null);
-  const [trait3, setTrait3] = useState<Trait | null>(null);
+  // const [trait1, setTrait1] = useState<Trait | null>(null);
+  // const [trait2, setTrait2] = useState<Trait | null>(null);
+  // const [trait3, setTrait3] = useState<Trait | null>(null);
   const [traits, setTraits] = useState<Trait[]>([]);
 
-  const showTrait3 = () => {
-    if (trait1 && trait2 && !trait3) {
-      return traitValueTotal < 3;
-    }
-    if (trait1 && trait2 && trait3) {
-      return traitValueTotal <= 3;
-    }
-    return false;
-  };
+  // const showTrait3 = () => {
+  //   if (trait1 && trait2 && !trait3) {
+  //     return traitValueTotal < 3;
+  //   }
+  //   if (trait1 && trait2 && trait3) {
+  //     return traitValueTotal <= 3;
+  //   }
+  //   return false;
+  // };
 
   const [selectedTraits, setSelectedTraits] = useState<Trait[]>([]);
-  const [traitValueTotal, setTraitValueTotal] = useState(0);
+  // const [traitValueTotal, setTraitValueTotal] = useState(0);
 
-  const handleAncestryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const ancestry = e.target.value;
+  // const handleAncestryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleAncestryChange = (ancestry: string) => {
+    // const ancestry = e.target.value;
     setSelectedAncestry(ancestry);
     setTraits(traitOptions[ancestry] || []);
-    setTrait1(null);
-    setTrait2(null);
-    setTrait3(null);
+    // setTrait1(null);
+    // setTrait2(null);
+    // setTrait3(null);
   };
 
-  const populateTraitOptions = (traits: Trait[], num: number) => {
-    if (num === 2) {
-      return traits.filter((trait) => trait.name !== trait1?.name);
+  // const populateTraitOptions = (traits: Trait[], num: number) => {
+  //   if (num === 2) {
+  //     return traits.filter((trait) => trait.name !== trait1?.name);
+  //   }
+  //   if (num === 3) {
+  //     return traits.filter(
+  //       (trait) => trait.name !== trait1?.name && trait.name !== trait2?.name
+  //     );
+  //   }
+  //   return traits;
+  // };
+
+  const handleTraitChange = (trait: Trait) => {
+    if (selectedTraits.includes(trait)) {
+      setSelectedTraits(selectedTraits.filter((t) => t !== trait));
+    } else {
+      setSelectedTraits([...selectedTraits, trait]);
     }
-    if (num === 3) {
-      return traits.filter(
-        (trait) => trait.name !== trait1?.name && trait.name !== trait2?.name
-      );
-    }
-    return traits;
-  };
+  }
 
-  const handleTraitChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-    traitNumber: number
-  ) => {
-    const selectedTraitName = e.target.value;
-    const selectedTrait = traitOptions[selectedAncestry].find(
-      (trait) => trait.name === selectedTraitName
-    );
+  // const handleTraitChange = (
+  //   e: React.ChangeEvent<HTMLSelectElement>,
+  //   traitNumber: number
+  // ) => {
+  //   const selectedTraitName = e.target.value;
+  //   const selectedTrait = traitOptions[selectedAncestry].find(
+  //     (trait) => trait.name === selectedTraitName
+  //   );
 
-    if (selectedTrait) {
-      if (traitNumber === 1) {
-        setTrait1(selectedTrait);
-      } else if (traitNumber === 2) {
-        setTrait2(selectedTrait);
-      } else if (traitNumber === 3) {
-        setTrait3(selectedTrait);
-      }
-    }
-  };
+  //   if (selectedTrait) {
+  //     if (traitNumber === 1) {
+  //       setTrait1(selectedTrait);
+  //     } else if (traitNumber === 2) {
+  //       setTrait2(selectedTrait);
+  //     } else if (traitNumber === 3) {
+  //       setTrait3(selectedTrait);
+  //     }
+  //   }
+  // };
 
-  useEffect(() => {
-    let updatedTraits = [trait1, trait2, trait3].filter(Boolean) as Trait[];
-    let value = 0;
+  // useEffect(() => {
+  //   let updatedTraits = [trait1, trait2, trait3].filter(Boolean) as Trait[];
+  //   let value = 0;
 
-    updatedTraits = updatedTraits.filter((trait, index) => {
-      value += trait.value;
-      if (value > 3) {
-        if (index === 1) setTrait2(null);
-        if (index === 2) setTrait3(null);
-        value -= trait.value;
-        return false;
-      }
-      return true;
-    });
+  //   updatedTraits = updatedTraits.filter((trait, index) => {
+  //     value += trait.value;
+  //     if (value > 3) {
+  //       if (index === 1) setTrait2(null);
+  //       if (index === 2) setTrait3(null);
+  //       value -= trait.value;
+  //       return false;
+  //     }
+  //     return true;
+  //   });
 
-    setSelectedTraits(updatedTraits);
-    setTraitValueTotal(value);
-  }, [trait1, trait2, trait3]);
+  //   setSelectedTraits(updatedTraits);
+  //   setTraitValueTotal(value);
+  // }, [trait1, trait2, trait3]);
 
   const [language, setLanguage] = useState<Language | null>(null);
 
@@ -283,12 +299,12 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col items-center w-2/3">
+    <div className="flex flex-col items-center">
       <div className="collapse collapse-arrow bg-base-200">
         <input type="radio" name="my-accordion-2" defaultChecked />
         <div className="collapse-title text-xl font-medium">Ancestry</div>
         <div className="bg-slate-800 collapse-content">
-          <select
+          {/* <select
             className="mt-4 select select-bordered w-full max-w-xs"
             value={selectedAncestry}
             onChange={handleAncestryChange}
@@ -302,11 +318,41 @@ export default function Home() {
                 {ancestry}
               </option>
             ))}
-          </select>
+          </select> */}
+
+          <div className="flex gap-3 pt-4">
+            {ancestryList.map((ancestry) => (
+              <button
+                key={ancestry}
+                className={`btn ${
+                  selectedAncestry === ancestry ? "btn-neutral" : ""
+                }`}
+                onClick={() => handleAncestryChange(ancestry)}
+              >
+                {ancestry}
+              </button>
+            ))}
+          </div>
+
+          <div>
+            {selectedAncestry === "Human" && <HumanPage traits={traits}/>}
+          </div>
   
           <div>
-            <div className="py-4 text-base font-medium">Traits</div>
-            <select
+            <div className="flex gap-3 pt-4">
+              {traits.map((trait: Trait) => (
+                <button
+                  key={trait.id}
+                  className={`btn ${
+                    selectedTraits.includes(trait) ? "btn-neutral" : ""
+                  }`}
+                  onClick={() => handleTraitChange(trait)}
+                >
+                  {trait.name}
+                </button>
+              ))}
+            </div>
+            {/* <select
               className="select select-bordered w-full max-w-xs"
               value={trait1?.name || ''}
               aria-label="Select trait 1"
@@ -356,7 +402,7 @@ export default function Home() {
                   {trait.name} (Value: {trait.value})
                 </option>
               ))}
-            </select>
+            </select> */}
           </div>
         </div>
       </div>
