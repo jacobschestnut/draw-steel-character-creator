@@ -12,6 +12,7 @@ import HumanPage from './components/ancestry_forms/human';
 type Trait = {
   id: number;
   name: string;
+  description: string;
   value: number;
   ancestry: string;
 };
@@ -46,22 +47,41 @@ export default function Home() {
   const ancestryList = ['Devil', 'Dragon Knight', 'Dwarf', 'Wode Elf', 'High Elf', 'Hakaan', 'Human', 'Memonek', 'Orc', 'Polder', 'Revenant', 'Time Raider'];
 
   const importedTraits = [
-    { id: 1, name: 'Detect The Supernatural', value: 2, ancestry: 'Human' },
-    { id: 2, name: 'Perseverance', value: 1, ancestry: 'Human' },
-    { id: 9, name: 'Leadership', value: 2, ancestry: 'Human' },
-    { id: 10, name: 'Enhanced Vision', value: 1, ancestry: 'Human' },
-    { id: 3, name: 'Barbed Tail', value: 2, ancestry: 'Devil' },
-    { id: 4, name: 'Silver Tongue', value: 1, ancestry: 'Devil' },
-    { id: 11, name: 'Infernal Charm', value: 2, ancestry: 'Devil' },
-    { id: 12, name: 'Night Vision', value: 1, ancestry: 'Devil' },
-    { id: 5, name: 'Forest Lore', value: 2, ancestry: 'Elf' },
-    { id: 6, name: 'Elven Agility', value: 1, ancestry: 'Elf' },
-    { id: 13, name: 'Nature’s Embrace', value: 2, ancestry: 'Elf' },
-    { id: 14, name: 'Arcane Knowledge', value: 1, ancestry: 'Elf' },
-    { id: 7, name: 'Savage Strength', value: 2, ancestry: 'Orc' },
-    { id: 8, name: 'Battle Fury', value: 1, ancestry: 'Orc' },
-    { id: 15, name: 'Ferocity', value: 2, ancestry: 'Orc' },
-    { id: 16, name: 'Toughness', value: 1, ancestry: 'Orc' },
+    {
+      id: 1,
+      name: 'CAN’T TAKE HOLD',
+      value: 1,
+      ancestry: 'Human',
+      description: `Your connection to the natural world allows you resist supernatural effects. You ignore difficult terrain (but not other effects) created by magic and psionic abilities. Additionally, when you are force moved by a magic or psionic ability, you reduce the forced movement by 1.`,
+    },
+    {
+      id: 2,
+      name: 'PERSEVERANCE',
+      value: 1,
+      ancestry: 'Human',
+      description: `Giving up is for other people. You have an edge on tests that use the Endurance skill and when you are slowed, your speed is reduced to 3 instead of 2.`,
+    },
+    {
+      id: 3,
+      name: 'RESIST THE UNNATURAL',
+      value: 1,
+      ancestry: 'Human',
+      description: `Your connection to the natural world protects you from unnatural forces. When you take damage that isn’t untyped, you can use your triggered action to half the damage.`,
+    },
+    {
+      id: 4,
+      name: 'DETERMINATION',
+      value: 2,
+      ancestry: 'Human',
+      description: `Your anatomical tolerance for pain allows you to push through difficult situations. If you are frightened, slowed, or weakened, you can use a maneuver to immediately end the condition.`,
+    },
+    {
+      id: 5,
+      name: 'STAYING POWER',
+      value: 2,
+      ancestry: 'Human',
+      description: `Your human anatomy allows you to fight, run, and stay awake longer than others. Increase your number of Recoveries by 2.`,
+    },
   ];
 
   const sortTraits = (arr: Trait[]) => {
@@ -76,92 +96,31 @@ export default function Home() {
   const traitOptions: { [key: string]: Trait[] } = sortTraits(importedTraits);
 
   const [selectedAncestry, setSelectedAncestry] = useState('');
-  // const [trait1, setTrait1] = useState<Trait | null>(null);
-  // const [trait2, setTrait2] = useState<Trait | null>(null);
-  // const [trait3, setTrait3] = useState<Trait | null>(null);
+
   const [traits, setTraits] = useState<Trait[]>([]);
 
-  // const showTrait3 = () => {
-  //   if (trait1 && trait2 && !trait3) {
-  //     return traitValueTotal < 3;
-  //   }
-  //   if (trait1 && trait2 && trait3) {
-  //     return traitValueTotal <= 3;
-  //   }
-  //   return false;
-  // };
-
   const [selectedTraits, setSelectedTraits] = useState<Trait[]>([]);
-  // const [traitValueTotal, setTraitValueTotal] = useState(0);
 
-  // const handleAncestryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const handleAncestryChange = (ancestry: string) => {
-    // const ancestry = e.target.value;
+  const handleAncestryChange = (ancestry: string) => {
     setSelectedAncestry(ancestry);
     setTraits(traitOptions[ancestry] || []);
-    // setTrait1(null);
-    // setTrait2(null);
-    // setTrait3(null);
   };
 
-  // const populateTraitOptions = (traits: Trait[], num: number) => {
-  //   if (num === 2) {
-  //     return traits.filter((trait) => trait.name !== trait1?.name);
-  //   }
-  //   if (num === 3) {
-  //     return traits.filter(
-  //       (trait) => trait.name !== trait1?.name && trait.name !== trait2?.name
-  //     );
-  //   }
-  //   return traits;
-  // };
-
   const handleTraitChange = (trait: Trait) => {
-    if (selectedTraits.includes(trait)) {
-      setSelectedTraits(selectedTraits.filter((t) => t !== trait));
-    } else {
-      setSelectedTraits([...selectedTraits, trait]);
-    }
-  }
+    setSelectedTraits((prevTraits) => {
+      const isTraitSelected = prevTraits.some((t) => t.id === trait.id);
 
-  // const handleTraitChange = (
-  //   e: React.ChangeEvent<HTMLSelectElement>,
-  //   traitNumber: number
-  // ) => {
-  //   const selectedTraitName = e.target.value;
-  //   const selectedTrait = traitOptions[selectedAncestry].find(
-  //     (trait) => trait.name === selectedTraitName
-  //   );
+      if (isTraitSelected) {
+        return prevTraits.filter((t) => t.id !== trait.id);
+      } else {
+        return [...prevTraits, trait];
+      }
+    });
+  };
 
-  //   if (selectedTrait) {
-  //     if (traitNumber === 1) {
-  //       setTrait1(selectedTrait);
-  //     } else if (traitNumber === 2) {
-  //       setTrait2(selectedTrait);
-  //     } else if (traitNumber === 3) {
-  //       setTrait3(selectedTrait);
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   let updatedTraits = [trait1, trait2, trait3].filter(Boolean) as Trait[];
-  //   let value = 0;
-
-  //   updatedTraits = updatedTraits.filter((trait, index) => {
-  //     value += trait.value;
-  //     if (value > 3) {
-  //       if (index === 1) setTrait2(null);
-  //       if (index === 2) setTrait3(null);
-  //       value -= trait.value;
-  //       return false;
-  //     }
-  //     return true;
-  //   });
-
-  //   setSelectedTraits(updatedTraits);
-  //   setTraitValueTotal(value);
-  // }, [trait1, trait2, trait3]);
+  useEffect(() => {
+    console.log(selectedTraits);
+  }, [selectedTraits]);
 
   const [language, setLanguage] = useState<Language | null>(null);
 
@@ -304,22 +263,6 @@ export default function Home() {
         <input type="radio" name="my-accordion-2" defaultChecked />
         <div className="collapse-title text-xl font-medium">Ancestry</div>
         <div className="bg-slate-800 collapse-content">
-          {/* <select
-            className="mt-4 select select-bordered w-full max-w-xs"
-            value={selectedAncestry}
-            onChange={handleAncestryChange}
-            aria-label="Select ancestry"
-          >
-            <option value="" disabled>
-              Select ancestry
-            </option>
-            {ancestryList.map((ancestry) => (
-              <option key={ancestry} value={ancestry}>
-                {ancestry}
-              </option>
-            ))}
-          </select> */}
-
           <div className="flex gap-3 pt-4">
             {ancestryList.map((ancestry) => (
               <button
@@ -335,74 +278,7 @@ export default function Home() {
           </div>
 
           <div>
-            {selectedAncestry === "Human" && <HumanPage traits={traits}/>}
-          </div>
-  
-          <div>
-            <div className="flex gap-3 pt-4">
-              {traits.map((trait: Trait) => (
-                <button
-                  key={trait.id}
-                  className={`btn ${
-                    selectedTraits.includes(trait) ? "btn-neutral" : ""
-                  }`}
-                  onClick={() => handleTraitChange(trait)}
-                >
-                  {trait.name}
-                </button>
-              ))}
-            </div>
-            {/* <select
-              className="select select-bordered w-full max-w-xs"
-              value={trait1?.name || ''}
-              aria-label="Select trait 1"
-              onChange={(e) => handleTraitChange(e, 1)}
-            >
-              <option value="" disabled>
-                Select trait
-              </option>
-              {populateTraitOptions(traits, 1).map((trait) => (
-                <option key={trait.id} value={trait.name}>
-                  {trait.name} (Value: {trait.value})
-                </option>
-              ))}
-            </select>
-  
-            <select
-              className="select select-bordered w-full max-w-xs"
-              value={trait2?.name || ''}
-              aria-label="Select trait 2"
-              onChange={(e) => handleTraitChange(e, 2)}
-              style={{ display: trait1 ? 'block' : 'none' }}
-            >
-              <option value="" disabled>
-                Select trait
-              </option>
-              {populateTraitOptions(traits, 2).map((trait) => (
-                <option key={trait.id} value={trait.name}>
-                  {trait.name} (Value: {trait.value})
-                </option>
-              ))}
-            </select>
-  
-            <select
-              className="select select-bordered w-full max-w-xs"
-              value={trait3?.name || ''}
-              aria-label="Select trait 3"
-              onChange={(e) => handleTraitChange(e, 3)}
-              style={{
-                display: showTrait3() ? 'block' : 'none',
-              }}
-            >
-              <option value="" disabled>
-                Select trait
-              </option>
-              {populateTraitOptions(traits, 3).map((trait) => (
-                <option key={trait.id} value={trait.name}>
-                  {trait.name} (Value: {trait.value})
-                </option>
-              ))}
-            </select> */}
+            {selectedAncestry === "Human" && <HumanPage traits={traits} handleTraitChange={handleTraitChange}/>}
           </div>
         </div>
       </div>
