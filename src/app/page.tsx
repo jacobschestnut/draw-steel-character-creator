@@ -44,6 +44,8 @@ type Upbringing = {
 };
 
 export default function Home() {
+  const [selectedTab, setSelectedTab] = useState('ancestry'); 
+  
   const ancestryList = ['Devil', 'Dragon Knight', 'Dwarf', 'Wode Elf', 'High Elf', 'Hakaan', 'Human', 'Memonek', 'Orc', 'Polder', 'Revenant', 'Time Raider'];
 
   const importedTraits = [
@@ -101,6 +103,8 @@ export default function Home() {
 
   const [selectedTraits, setSelectedTraits] = useState<Trait[]>([]);
 
+  const [selectedTraitsValue, setSelectedTraitsValue] = useState<number>(0);
+
   const handleAncestryChange = (ancestry: string) => {
     setSelectedAncestry(ancestry);
     setTraits(traitOptions[ancestry] || []);
@@ -109,18 +113,33 @@ export default function Home() {
   const handleTraitChange = (trait: Trait) => {
     setSelectedTraits((prevTraits) => {
       const isTraitSelected = prevTraits.some((t) => t.id === trait.id);
-
+  
+      let newSelectedTraits;
+      let newSelectedTraitsValue;
+  
       if (isTraitSelected) {
-        return prevTraits.filter((t) => t.id !== trait.id);
+        newSelectedTraits = prevTraits.filter((t) => t.id !== trait.id);
+        newSelectedTraitsValue = newSelectedTraits.reduce(
+          (total, selectedTrait) => total + selectedTrait.value,
+          0
+        );
       } else {
-        return [...prevTraits, trait];
+        if (selectedTraitsValue + trait.value > 3) {
+          return prevTraits;
+        }
+  
+        newSelectedTraits = [...prevTraits, trait];
+        newSelectedTraitsValue = newSelectedTraits.reduce(
+          (total, selectedTrait) => total + selectedTrait.value,
+          0
+        );
       }
+  
+      setSelectedTraitsValue(newSelectedTraitsValue); // Update the selectedTraitsValue
+  
+      return newSelectedTraits;
     });
   };
-
-  useEffect(() => {
-    console.log(selectedTraits);
-  }, [selectedTraits]);
 
   const [language, setLanguage] = useState<Language | null>(null);
 
@@ -257,148 +276,202 @@ export default function Home() {
     },
   ];
 
-  return (
-    <div className="flex flex-col items-center">
-      <div className="collapse collapse-arrow bg-base-200">
-        <input type="radio" name="my-accordion-2" defaultChecked />
-        <div className="collapse-title text-xl font-medium">Ancestry</div>
-        <div className="bg-slate-800 collapse-content">
-          <div className="flex gap-3 pt-4">
-            {ancestryList.map((ancestry) => (
-              <button
-                key={ancestry}
-                className={`btn ${
-                  selectedAncestry === ancestry ? "btn-neutral" : ""
-                }`}
-                onClick={() => handleAncestryChange(ancestry)}
-              >
-                {ancestry}
-              </button>
-            ))}
-          </div>
+  const handleTabChange = (tabName: string) => {
+    setSelectedTab(tabName);
+  };
 
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      {/* Outer Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 w-full h-screen">
+        {/* Left Column: Tabs */}
+        <div className="flex flex-col gap-6 w-full h-full overflow-y-auto p-4 bg-base-200">
+          {/* Tabs Navigation */}
+          <div role="tablist" className="tabs tabs-bordered mb-4">
+            <button
+              role="tab"
+              className={`tab ${selectedTab === 'ancestry' ? 'tab-active' : ''}`}
+              onClick={() => handleTabChange('ancestry')}
+            >
+              Ancestry
+            </button>
+            <button
+              role="tab"
+              className={`tab ${selectedTab === 'culture' ? 'tab-active' : ''}`}
+              onClick={() => handleTabChange('culture')}
+            >
+              Culture
+            </button>
+          </div>
+  
+          {/* Tab Content */}
           <div>
-            {selectedAncestry === "Human" && <HumanPage traits={traits} handleTraitChange={handleTraitChange}/>}
+            {/* Ancestry Tab */}
+            {selectedTab === 'ancestry' && (
+              <div role="tabpanel" className="p-4 bg-slate-800 rounded-md shadow">
+                <div className="flex gap-3 pt-4 flex-wrap">
+                  {ancestryList.map((ancestry) => (
+                    <button
+                      key={ancestry}
+                      className={`btn ${
+                        selectedAncestry === ancestry ? 'btn-neutral' : ''
+                      }`}
+                      onClick={() => handleAncestryChange(ancestry)}
+                    >
+                      {ancestry}
+                    </button>
+                  ))}
+                </div>
+                {selectedAncestry === 'Human' && (
+                  <div className="mt-4">
+                    <HumanPage
+                      traits={traits}
+                      handleTraitChange={handleTraitChange}
+                      selectedTraits={selectedTraits}
+                      selectedTraitsValue={selectedTraitsValue}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+  
+            {/* Culture Tab */}
+            {selectedTab === 'culture' && (
+              <div role="tabpanel" className="p-4 bg-slate-800 rounded-md shadow">
+                {/* Language Section */}
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold">Language</h3>
+                  <select
+                    className="select select-bordered w-full mt-2"
+                    value={language?.name || ''}
+                    onChange={(e) => {
+                      const selectedLanguage = languages.find(
+                        (lang) => lang.name === e.target.value
+                      );
+                      setLanguage(selectedLanguage || null);
+                    }}
+                  >
+                    <option value="" disabled>
+                      Select language
+                    </option>
+                    {languages.map((lang) => (
+                      <option key={lang.id} value={lang.name}>
+                        {lang.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+  
+                {/* Environment Section */}
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold">Environment</h3>
+                  <div className="flex items-center gap-4 mt-2">
+                    <select
+                      className="select select-bordered w-full"
+                      value={environment?.name || ''}
+                      onChange={(e) => {
+                        const selectedEnvironment = environments.find(
+                          (env) => env.name === e.target.value
+                        );
+                        setEnvironment(selectedEnvironment || null);
+                      }}
+                    >
+                      <option value="" disabled>
+                        Select environment
+                      </option>
+                      {environments.map((env) => (
+                        <option key={env.id} value={env.name}>
+                          {env.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-sm">
+                      {environment ? environment.description : ''}
+                    </p>
+                  </div>
+                </div>
+  
+                {/* Organization Section */}
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold">Organization</h3>
+                  <div className="flex items-center gap-4 mt-2">
+                    <select
+                      className="select select-bordered w-full"
+                      value={organization?.name || ''}
+                      onChange={(e) => {
+                        const selectedOrg = organizations.find(
+                          (org) => org.name === e.target.value
+                        );
+                        setOrganization(selectedOrg || null);
+                      }}
+                    >
+                      <option value="" disabled>
+                        Select organization
+                      </option>
+                      {organizations.map((org) => (
+                        <option key={org.id} value={org.name}>
+                          {org.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-sm">
+                      {organization ? organization.description : ''}
+                    </p>
+                  </div>
+                </div>
+  
+                {/* Upbringing Section */}
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold">Upbringing</h3>
+                  <div className="flex items-center gap-4 mt-2">
+                    <select
+                      className="select select-bordered w-full"
+                      value={upbringing?.name || ''}
+                      onChange={(e) => {
+                        const selectedUpbringing = upbringings.find(
+                          (up) => up.name === e.target.value
+                        );
+                        setUpbringing(selectedUpbringing || null);
+                      }}
+                    >
+                      <option value="" disabled>
+                        Select upbringing
+                      </option>
+                      {upbringings.map((up) => (
+                        <option key={up.id} value={up.name}>
+                          {up.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-sm">
+                      {upbringing ? upbringing.description : ''}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      </div>
   
-      <div className="collapse collapse-arrow bg-base-200">
-        <input type="radio" name="my-accordion-2" />
-        <div className="collapse-title text-xl font-medium">Culture</div>
-        <div className="bg-slate-800 collapse-content">
-          <div>
-            <div className="py-4 text-base font-medium">Language</div>
-            <select
-              className="select select-bordered w-full max-w-xs"
-              value={language?.name || ''}
-              aria-label="Select language"
-              onChange={(e) => {
-                const selectedLanguage = languages.find(
-                  (language) => language.name === e.target.value
-                );
-                setLanguage(selectedLanguage || null);
-              }}
-            >
-              <option value="" disabled>
-                Select language
-              </option>
-              {languages.map((language) => (
-                <option key={language.id} value={language.name}>
-                  {language.name}
-                </option>
+        {/* Right Column */}
+        <div className="flex flex-col w-full h-full p-4 bg-base-200">
+          <div className="card bg-slate-500 shadow-md p-6 my-2">
+            <h2 className="card-title">Ancestry</h2>
+            <div className="divider h-0"></div>
+            <div>{selectedAncestry}</div>
+          </div>
+          <div className="card bg-slate-500 shadow-md p-6 my-2">
+            <h2 className="card-title">Traits</h2>
+            <div className="divider h-0"></div>
+            <div className='flex flex-col'>
+              {selectedTraits.map((trait) => (
+                <div key={trait.id}>{trait.name}</div>
               ))}
-            </select>
-          </div>
-  
-          <div>
-            <div className="py-4 text-base font-medium">Environment</div>
-            <div className="grid grid-cols-3 gap-4">
-              <select
-                className="select select-bordered w-full max-w-xs col-span-1"
-                value={environment?.name || ''}
-                aria-label="Select environment"
-                onChange={(e) => {
-                  const selectedEnvironment = environments.find(
-                    (environment) => environment.name === e.target.value
-                  );
-                  setEnvironment(selectedEnvironment || null);
-                }}
-              >
-                <option value="" disabled>
-                  Select environment
-                </option>
-                {environments.map((environment) => (
-                  <option key={environment.id} value={environment.name}>
-                    {environment.name}
-                  </option>
-                ))}
-              </select>
-              <p className="text-sm flex items-center justify-center col-span-2">
-                {environment ? environment.description : ''}
-              </p>
-            </div>
-          </div>
-  
-          <div>
-            <div className="py-4 text-base font-medium">Organization</div>
-            <div className="grid grid-cols-3 gap-4">
-              <select
-                className="select select-bordered w-full max-w-xs col-span-1"
-                value={organization?.name || ''}
-                aria-label="Select organization"
-                onChange={(e) => {
-                  const selectedOrganization = organizations.find(
-                    (organization) => organization.name === e.target.value
-                  );
-                  setOrganization(selectedOrganization || null);
-                }}
-              >
-                <option value="" disabled>
-                  Select organization
-                </option>
-                {organizations.map((organization) => (
-                  <option key={organization.id} value={organization.name}>
-                    {organization.name}
-                  </option>
-                ))}
-              </select>
-              <p className="text-sm flex items-center justify-center col-span-2">
-                {organization ? organization.description : ''}
-              </p>
-            </div>
-          </div>
-  
-          <div>
-            <div className="py-4 text-base font-medium">Upbringing</div>
-            <div className="grid grid-cols-3 gap-4">
-              <select
-                className="select select-bordered w-full max-w-xs col-span-1"
-                value={upbringing?.name || ''}
-                aria-label="Select upbringing"
-                onChange={(e) => {
-                  const selectedUpbringing = upbringings.find(
-                    (upbringing) => upbringing.name === e.target.value
-                  );
-                  setUpbringing(selectedUpbringing || null);
-                }}
-              >
-                <option value="" disabled>
-                  Select upbringing
-                </option>
-                {upbringings.map((upbringing) => (
-                  <option key={upbringing.id} value={upbringing.name}>
-                    {upbringing.name}
-                  </option>
-                ))}
-              </select>
-              <p className="text-sm flex items-center justify-center col-span-2">
-                {upbringing ? upbringing.description : ''}
-              </p>
             </div>
           </div>
         </div>
       </div>
     </div>
-  );  
-}
+  );
+};
+  
