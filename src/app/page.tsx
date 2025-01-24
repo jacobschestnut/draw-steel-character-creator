@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import HumanPage from './components/ancestry_forms/human';
+import EnvironmentCard from './components/culture/environment_card';
 
 // type Ancestry = {
 //   id: number;
@@ -42,6 +43,17 @@ type Upbringing = {
   description: string;
   quickBuildSkill: string;
 };
+
+type SkillGroups = {
+  id: number;
+  name: string;
+}
+
+type Skill = {
+  id: number;
+  name: string;
+  skill_group_id: number;
+}
 
 export default function Home() {
   const [selectedTab, setSelectedTab] = useState('ancestry'); 
@@ -101,9 +113,9 @@ export default function Home() {
 
   const [traits, setTraits] = useState<Trait[]>([]);
 
-  const [selectedTraits, setSelectedTraits] = useState<Trait[]>([]);
+  const [selectedAncestryTraits, setSelectedAncestryTraits] = useState<Trait[]>([]);
 
-  const [selectedTraitsValue, setSelectedTraitsValue] = useState<number>(0);
+  const [selectedAncestryTraitsValue, setSelectedAncestryTraitsValue] = useState<number>(0);
 
   const handleAncestryChange = (ancestry: string) => {
     setSelectedAncestry(ancestry);
@@ -111,33 +123,33 @@ export default function Home() {
   };
 
   const handleTraitChange = (trait: Trait) => {
-    setSelectedTraits((prevTraits) => {
+    setSelectedAncestryTraits((prevTraits) => {
       const isTraitSelected = prevTraits.some((t) => t.id === trait.id);
   
-      let newSelectedTraits;
-      let newSelectedTraitsValue;
+      let newSelectedAncestryTraits;
+      let newSelectedAncestryTraitsValue;
   
       if (isTraitSelected) {
-        newSelectedTraits = prevTraits.filter((t) => t.id !== trait.id);
-        newSelectedTraitsValue = newSelectedTraits.reduce(
+        newSelectedAncestryTraits = prevTraits.filter((t) => t.id !== trait.id);
+        newSelectedAncestryTraitsValue = newSelectedAncestryTraits.reduce(
           (total, selectedTrait) => total + selectedTrait.value,
           0
         );
       } else {
-        if (selectedTraitsValue + trait.value > 3) {
+        if (selectedAncestryTraitsValue + trait.value > 3) {
           return prevTraits;
         }
   
-        newSelectedTraits = [...prevTraits, trait];
-        newSelectedTraitsValue = newSelectedTraits.reduce(
+        newSelectedAncestryTraits = [...prevTraits, trait];
+        newSelectedAncestryTraitsValue = newSelectedAncestryTraits.reduce(
           (total, selectedTrait) => total + selectedTrait.value,
           0
         );
       }
   
-      setSelectedTraitsValue(newSelectedTraitsValue); // Update the selectedTraitsValue
+      setSelectedAncestryTraitsValue(newSelectedAncestryTraitsValue); // Update the selectedAncestryTraitsValue
   
-      return newSelectedTraits;
+      return newSelectedAncestryTraits;
     });
   };
 
@@ -280,10 +292,79 @@ export default function Home() {
     setSelectedTab(tabName);
   };
 
+  const skillGroups: SkillGroups[] = [
+    { id: 1, name: 'Lore' },
+    { id: 2, name: 'Intrigue' },
+    { id: 3, name: 'Interpersonal' },
+    { id: 4, name: 'Exploration' },
+    { id: 5, name: 'Crafting' },
+  ];
+
+  const skills: Skill[] = [
+    { id: 1, name: 'Culture', skill_group_id: 1 },
+    { id: 2, name: 'Criminal Underworld', skill_group_id: 1 },
+    { id: 3, name: 'History', skill_group_id: 1 },
+    { id: 4, name: 'Magic', skill_group_id: 1 },
+    { id: 5, name: 'Monsters', skill_group_id: 1 },
+    { id: 6, name: 'Nature', skill_group_id: 1 },
+    { id: 7, name: 'Psionics', skill_group_id: 1 },
+    { id: 8, name: 'Religion', skill_group_id: 1 },
+    { id: 9, name: 'Rumors', skill_group_id: 1 },
+    { id: 10, name: 'Society', skill_group_id: 1 },
+    { id: 11, name: 'Strategy', skill_group_id: 1 },
+    { id: 12, name: 'Timescape', skill_group_id: 1 },
+    { id: 13, name: 'Alertness', skill_group_id: 2 },
+    { id: 14, name: 'Conceal Object', skill_group_id: 2 },
+    { id: 15, name: 'Disguise', skill_group_id: 2 },
+    { id: 16, name: 'Eavesdrop', skill_group_id: 2 },
+    { id: 17, name: 'Escape Artist', skill_group_id: 2 },
+    { id: 18, name: 'Hide', skill_group_id: 2 },
+    { id: 19, name: 'Pick Lock', skill_group_id: 2 },
+    { id: 20, name: 'Pick Pocket', skill_group_id: 2 },
+    { id: 21, name: 'Sabotage', skill_group_id: 2 },
+    { id: 22, name: 'Search', skill_group_id: 2 },
+    { id: 23, name: 'Sneak', skill_group_id: 2 },
+    { id: 24, name: 'Track', skill_group_id: 2 },
+    { id: 25, name: 'Brag', skill_group_id: 3 },
+    { id: 26, name: 'Empathize', skill_group_id: 3 },
+    { id: 27, name: 'Flirt', skill_group_id: 3 },
+    { id: 28, name: 'Gamble', skill_group_id: 3 },
+    { id: 29, name: 'Handle Animals', skill_group_id: 3 },
+    { id: 30, name: 'Interrogate', skill_group_id: 3 },
+    { id: 31, name: 'Intimidate', skill_group_id: 3 },
+    { id: 32, name: 'Lead', skill_group_id: 3 },
+    { id: 33, name: 'Lie', skill_group_id: 3 },
+    { id: 34, name: 'Music', skill_group_id: 3 },
+    { id: 35, name: 'Perform', skill_group_id: 3 },
+    { id: 36, name: 'Persuade', skill_group_id: 3 },
+    { id: 37, name: 'Read Person', skill_group_id: 3 },
+    { id: 38, name: 'Climb', skill_group_id: 4 },
+    { id: 39, name: 'Drive', skill_group_id: 4 },
+    { id: 40, name: 'Endurance', skill_group_id: 4 },
+    { id: 41, name: 'Gymnastics', skill_group_id: 4 },
+    { id: 42, name: 'Heal', skill_group_id: 4 },
+    { id: 43, name: 'Jump', skill_group_id: 4 },
+    { id: 44, name: 'Lift', skill_group_id: 4 },
+    { id: 45, name: 'Navigate', skill_group_id: 4 },
+    { id: 46, name: 'Ride', skill_group_id: 4 },
+    { id: 47, name: 'Swim', skill_group_id: 4 },
+    { id: 48, name: 'Alchemy', skill_group_id: 5 },
+    { id: 49, name: 'Architecture', skill_group_id: 5 },
+    { id: 50, name: 'Blacksmithing', skill_group_id: 5 },
+    { id: 51, name: 'Carpentry', skill_group_id: 5 },
+    { id: 52, name: 'Cooking', skill_group_id: 5 },
+    { id: 53, name: 'Fletching', skill_group_id: 5 },
+    { id: 54, name: 'Forgery', skill_group_id: 5 },
+    { id: 55, name: 'Jewelry', skill_group_id: 5 },
+    { id: 56, name: 'Mechanics', skill_group_id: 5 },
+    { id: 57, name: 'Tailoring', skill_group_id: 5 },
+  ];
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center min-h-screen">
       {/* Outer Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 w-full h-screen">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 w-full h-screen"> */}
+      <div className='w-full h-full'>
         {/* Left Column: Tabs */}
         <div className="flex flex-col gap-6 w-full h-full overflow-y-auto p-4 bg-base-200">
           {/* Tabs Navigation */}
@@ -327,8 +408,8 @@ export default function Home() {
                     <HumanPage
                       traits={traits}
                       handleTraitChange={handleTraitChange}
-                      selectedTraits={selectedTraits}
-                      selectedTraitsValue={selectedTraitsValue}
+                      selectedAncestryTraits={selectedAncestryTraits}
+                      selectedAncestryTraitsValue={selectedAncestryTraitsValue}
                     />
                   </div>
                 )}
@@ -339,60 +420,42 @@ export default function Home() {
             {selectedTab === 'culture' && (
               <div role="tabpanel" className="p-4 bg-slate-800 rounded-md shadow">
                 {/* Language Section */}
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold">Language</h3>
-                  <select
-                    className="select select-bordered w-full mt-2"
-                    value={language?.name || ''}
-                    onChange={(e) => {
-                      const selectedLanguage = languages.find(
-                        (lang) => lang.name === e.target.value
-                      );
-                      setLanguage(selectedLanguage || null);
-                    }}
-                  >
-                    <option value="" disabled>
-                      Select language
+                <div className="text-lg font-bold pb-4">LANGUAGE</div>
+                <select
+                  className="select select-bordered w-full mb-4"
+                  value={language?.name || ''}
+                  onChange={(e) => {
+                    const selectedLanguage = languages.find(
+                      (lang) => lang.name === e.target.value
+                    );
+                    setLanguage(selectedLanguage || null);
+                  }}
+                >
+                  <option value="" disabled>
+                    Select language
+                  </option>
+                  {languages.map((lang) => (
+                    <option key={lang.id} value={lang.name}>
+                      {lang.name}
                     </option>
-                    {languages.map((lang) => (
-                      <option key={lang.id} value={lang.name}>
-                        {lang.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  ))}
+                </select>
   
                 {/* Environment Section */}
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold">Environment</h3>
-                  <div className="flex items-center gap-4 mt-2">
-                    <select
-                      className="select select-bordered w-full"
-                      value={environment?.name || ''}
-                      onChange={(e) => {
-                        const selectedEnvironment = environments.find(
-                          (env) => env.name === e.target.value
-                        );
-                        setEnvironment(selectedEnvironment || null);
-                      }}
-                    >
-                      <option value="" disabled>
-                        Select environment
-                      </option>
-                      {environments.map((env) => (
-                        <option key={env.id} value={env.name}>
-                          {env.name}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-sm">
-                      {environment ? environment.description : ''}
-                    </p>
-                  </div>
+                <div className='text-lg font-bold pb-4'>ENVIRONMENT</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {environments.map((env) => (
+                        <EnvironmentCard
+                            key={env.id}
+                            selectedEnvironment={environment}
+                            env={env}
+                            setEnvironment={setEnvironment}
+                        />
+                    ))}
                 </div>
   
                 {/* Organization Section */}
-                <div className="mb-4">
+                {/* <div className="mb-4">
                   <h3 className="text-lg font-semibold">Organization</h3>
                   <div className="flex items-center gap-4 mt-2">
                     <select
@@ -418,10 +481,10 @@ export default function Home() {
                       {organization ? organization.description : ''}
                     </p>
                   </div>
-                </div>
+                </div> */}
   
                 {/* Upbringing Section */}
-                <div className="mb-4">
+                {/* <div className="mb-4">
                   <h3 className="text-lg font-semibold">Upbringing</h3>
                   <div className="flex items-center gap-4 mt-2">
                     <select
@@ -447,29 +510,27 @@ export default function Home() {
                       {upbringing ? upbringing.description : ''}
                     </p>
                   </div>
-                </div>
+                </div> */}
               </div>
             )}
           </div>
         </div>
   
         {/* Right Column */}
-        <div className="flex flex-col w-full h-full p-4 bg-base-200">
+        {/* <div className="flex flex-col w-full h-full p-4 bg-base-200">
           <div className="card bg-slate-500 shadow-md p-6 my-2">
-            <h2 className="card-title">Ancestry</h2>
-            <div className="divider h-0"></div>
-            <div>{selectedAncestry}</div>
-          </div>
-          <div className="card bg-slate-500 shadow-md p-6 my-2">
-            <h2 className="card-title">Traits</h2>
-            <div className="divider h-0"></div>
-            <div className='flex flex-col'>
-              {selectedTraits.map((trait) => (
-                <div key={trait.id}>{trait.name}</div>
-              ))}
+            <div>
+                <strong>Ancestry</strong> <span>{selectedAncestry}</span>
+            </div>
+            <div className='flex flex-row'>
+                <strong>Traits</strong>
+                &nbsp;
+                <span className="flex">
+                  {selectedAncestryTraits.map((trait) => trait.name).join(', ')}
+                </span>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

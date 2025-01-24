@@ -14,16 +14,16 @@ type Trait = {
 type HumanPageProps = {
     traits: Trait[];
     handleTraitChange: (trait: Trait) => void;
-    selectedTraits: Trait[];
-    selectedTraitsValue: number;
+    selectedAncestryTraits: Trait[];
+    selectedAncestryTraitsValue: number;
 }; 
 
-const HumanPage: FC<HumanPageProps> = ({traits, handleTraitChange, selectedTraits, selectedTraitsValue }) => {
+const HumanPage: FC<HumanPageProps> = ({traits, handleTraitChange, selectedAncestryTraits, selectedAncestryTraitsValue }) => {
     const [remainingPoints, setRemainingPoints] = useState<number>(3);
 
     useEffect(() => {
-        setRemainingPoints(3 - selectedTraitsValue);
-    }, [selectedTraitsValue]);
+        setRemainingPoints(3 - selectedAncestryTraitsValue);
+    }, [selectedAncestryTraitsValue]);
 
     return (
         <div className='pt-4'>
@@ -53,7 +53,7 @@ const HumanPage: FC<HumanPageProps> = ({traits, handleTraitChange, selectedTrait
                         key={trait.id}
                         trait={trait}
                         handleTraitChange={handleTraitChange}
-                        selectedTraits={selectedTraits}
+                        selectedAncestryTraits={selectedAncestryTraits}
                     />
                 ))}
             </div>
