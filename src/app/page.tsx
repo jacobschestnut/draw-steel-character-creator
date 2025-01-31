@@ -3,20 +3,11 @@
 import { useState, useEffect } from 'react';
 import HumanPage from './components/ancestry_forms/human';
 import EnvironmentCard from './components/culture/environment_card';
-
-// type Ancestry = {
-//   id: number;
-//   name: string;
-//   description: string;
-// }
-
-type Trait = {
-  id: number;
-  name: string;
-  description: string;
-  value: number;
-  ancestry: string;
-};
+import OrganizationCard from './components/culture/organization_card';
+import { Ancestry } from '@/types/Ancestry';
+import { Trait } from '@/types/Trait';
+import DevilPage from './components/ancestry_forms/devil';
+import { Skill } from '@/types/Skill';
 
 type Language = {
   id: number;
@@ -34,7 +25,7 @@ type Organization = {
   id: number;
   name: string;
   description: string;
-  quickBuildSkill: string;
+  quickBuildSkill: number;
 };
 
 type Upbringing = {
@@ -44,72 +35,48 @@ type Upbringing = {
   quickBuildSkill: string;
 };
 
-type SkillGroups = {
-  id: number;
-  name: string;
-}
-
-type Skill = {
-  id: number;
-  name: string;
-  skill_group_id: number;
-}
-
 export default function Home() {
   const [selectedTab, setSelectedTab] = useState('ancestry'); 
+
+  const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
   
-  const ancestryList = ['Devil', 'Dragon Knight', 'Dwarf', 'Wode Elf', 'High Elf', 'Hakaan', 'Human', 'Memonek', 'Orc', 'Polder', 'Revenant', 'Time Raider'];
+  const [ancestryList, setAncestryList] = useState<Ancestry[]>([]);
 
-  const importedTraits = [
-    {
-      id: 1,
-      name: 'CAN’T TAKE HOLD',
-      value: 1,
-      ancestry: 'Human',
-      description: `Your connection to the natural world allows you resist supernatural effects. You ignore difficult terrain (but not other effects) created by magic and psionic abilities. Additionally, when you are force moved by a magic or psionic ability, you reduce the forced movement by 1.`,
-    },
-    {
-      id: 2,
-      name: 'PERSEVERANCE',
-      value: 1,
-      ancestry: 'Human',
-      description: `Giving up is for other people. You have an edge on tests that use the Endurance skill and when you are slowed, your speed is reduced to 3 instead of 2.`,
-    },
-    {
-      id: 3,
-      name: 'RESIST THE UNNATURAL',
-      value: 1,
-      ancestry: 'Human',
-      description: `Your connection to the natural world protects you from unnatural forces. When you take damage that isn’t untyped, you can use your triggered action to half the damage.`,
-    },
-    {
-      id: 4,
-      name: 'DETERMINATION',
-      value: 2,
-      ancestry: 'Human',
-      description: `Your anatomical tolerance for pain allows you to push through difficult situations. If you are frightened, slowed, or weakened, you can use a maneuver to immediately end the condition.`,
-    },
-    {
-      id: 5,
-      name: 'STAYING POWER',
-      value: 2,
-      ancestry: 'Human',
-      description: `Your human anatomy allows you to fight, run, and stay awake longer than others. Increase your number of Recoveries by 2.`,
-    },
-  ];
+  useEffect(() => {
+    const fetchAncestries = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/ancestries/');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const result = await response.json();
+        setAncestryList(result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  const sortTraits = (arr: Trait[]) => {
-    const groupedTraits: { [key: string]: Trait[] } = {};
-    arr.forEach((trait) => {
-      if (!groupedTraits[trait.ancestry]) groupedTraits[trait.ancestry] = [];
-      groupedTraits[trait.ancestry].push(trait);
-    });
-    return groupedTraits;
-  };
+    fetchAncestries();
+  }, []);
+  
+  const [selectedAncestry, setSelectedAncestry] = useState<Ancestry | null>();
 
-  const traitOptions: { [key: string]: Trait[] } = sortTraits(importedTraits);
+  useEffect(() => {
+    const fetchTraits = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/ancestries/${selectedAncestry?.ancestry_id}/traits/`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const result = await response.json();
+        setTraits(result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-  const [selectedAncestry, setSelectedAncestry] = useState('');
+    fetchTraits();
+  }, [selectedAncestry]);
 
   const [traits, setTraits] = useState<Trait[]>([]);
 
@@ -117,32 +84,31 @@ export default function Home() {
 
   const [selectedAncestryTraitsValue, setSelectedAncestryTraitsValue] = useState<number>(0);
 
-  const handleAncestryChange = (ancestry: string) => {
+  const handleAncestryChange = (ancestry: Ancestry) => {
     setSelectedAncestry(ancestry);
-    setTraits(traitOptions[ancestry] || []);
-  };
+  };  
 
   const handleTraitChange = (trait: Trait) => {
     setSelectedAncestryTraits((prevTraits) => {
-      const isTraitSelected = prevTraits.some((t) => t.id === trait.id);
+      const isTraitSelected = prevTraits.some((t) => t.trait_id === trait.trait_id);
   
       let newSelectedAncestryTraits;
       let newSelectedAncestryTraitsValue;
   
       if (isTraitSelected) {
-        newSelectedAncestryTraits = prevTraits.filter((t) => t.id !== trait.id);
+        newSelectedAncestryTraits = prevTraits.filter((t) => t.trait_id !== trait.trait_id);
         newSelectedAncestryTraitsValue = newSelectedAncestryTraits.reduce(
-          (total, selectedTrait) => total + selectedTrait.value,
+          (total, selectedTrait) => total + selectedTrait.cost,
           0
         );
       } else {
-        if (selectedAncestryTraitsValue + trait.value > 3) {
+        if (selectedAncestryTraitsValue + trait.cost > 3) {
           return prevTraits;
         }
   
         newSelectedAncestryTraits = [...prevTraits, trait];
         newSelectedAncestryTraitsValue = newSelectedAncestryTraits.reduce(
-          (total, selectedTrait) => total + selectedTrait.value,
+          (total, selectedTrait) => total + selectedTrait.cost,
           0
         );
       }
@@ -203,7 +169,7 @@ export default function Home() {
     },
   ];
 
-  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [selectedOrganization, setSelectedOrganization] = useState<Organization | null>(null);
 
   const organizations: Organization[] = [
     {
@@ -292,73 +258,25 @@ export default function Home() {
     setSelectedTab(tabName);
   };
 
-  const skillGroups: SkillGroups[] = [
-    { id: 1, name: 'Lore' },
-    { id: 2, name: 'Intrigue' },
-    { id: 3, name: 'Interpersonal' },
-    { id: 4, name: 'Exploration' },
-    { id: 5, name: 'Crafting' },
-  ];
+  const handleAncestryTabSkillSelection = (skills: Skill[]) => {
+    const updatedSkills = [...selectedSkills];
+    for (const newSkill of skills) {
+        let isSkillAlreadySelected = false;
 
-  const skills: Skill[] = [
-    { id: 1, name: 'Culture', skill_group_id: 1 },
-    { id: 2, name: 'Criminal Underworld', skill_group_id: 1 },
-    { id: 3, name: 'History', skill_group_id: 1 },
-    { id: 4, name: 'Magic', skill_group_id: 1 },
-    { id: 5, name: 'Monsters', skill_group_id: 1 },
-    { id: 6, name: 'Nature', skill_group_id: 1 },
-    { id: 7, name: 'Psionics', skill_group_id: 1 },
-    { id: 8, name: 'Religion', skill_group_id: 1 },
-    { id: 9, name: 'Rumors', skill_group_id: 1 },
-    { id: 10, name: 'Society', skill_group_id: 1 },
-    { id: 11, name: 'Strategy', skill_group_id: 1 },
-    { id: 12, name: 'Timescape', skill_group_id: 1 },
-    { id: 13, name: 'Alertness', skill_group_id: 2 },
-    { id: 14, name: 'Conceal Object', skill_group_id: 2 },
-    { id: 15, name: 'Disguise', skill_group_id: 2 },
-    { id: 16, name: 'Eavesdrop', skill_group_id: 2 },
-    { id: 17, name: 'Escape Artist', skill_group_id: 2 },
-    { id: 18, name: 'Hide', skill_group_id: 2 },
-    { id: 19, name: 'Pick Lock', skill_group_id: 2 },
-    { id: 20, name: 'Pick Pocket', skill_group_id: 2 },
-    { id: 21, name: 'Sabotage', skill_group_id: 2 },
-    { id: 22, name: 'Search', skill_group_id: 2 },
-    { id: 23, name: 'Sneak', skill_group_id: 2 },
-    { id: 24, name: 'Track', skill_group_id: 2 },
-    { id: 25, name: 'Brag', skill_group_id: 3 },
-    { id: 26, name: 'Empathize', skill_group_id: 3 },
-    { id: 27, name: 'Flirt', skill_group_id: 3 },
-    { id: 28, name: 'Gamble', skill_group_id: 3 },
-    { id: 29, name: 'Handle Animals', skill_group_id: 3 },
-    { id: 30, name: 'Interrogate', skill_group_id: 3 },
-    { id: 31, name: 'Intimidate', skill_group_id: 3 },
-    { id: 32, name: 'Lead', skill_group_id: 3 },
-    { id: 33, name: 'Lie', skill_group_id: 3 },
-    { id: 34, name: 'Music', skill_group_id: 3 },
-    { id: 35, name: 'Perform', skill_group_id: 3 },
-    { id: 36, name: 'Persuade', skill_group_id: 3 },
-    { id: 37, name: 'Read Person', skill_group_id: 3 },
-    { id: 38, name: 'Climb', skill_group_id: 4 },
-    { id: 39, name: 'Drive', skill_group_id: 4 },
-    { id: 40, name: 'Endurance', skill_group_id: 4 },
-    { id: 41, name: 'Gymnastics', skill_group_id: 4 },
-    { id: 42, name: 'Heal', skill_group_id: 4 },
-    { id: 43, name: 'Jump', skill_group_id: 4 },
-    { id: 44, name: 'Lift', skill_group_id: 4 },
-    { id: 45, name: 'Navigate', skill_group_id: 4 },
-    { id: 46, name: 'Ride', skill_group_id: 4 },
-    { id: 47, name: 'Swim', skill_group_id: 4 },
-    { id: 48, name: 'Alchemy', skill_group_id: 5 },
-    { id: 49, name: 'Architecture', skill_group_id: 5 },
-    { id: 50, name: 'Blacksmithing', skill_group_id: 5 },
-    { id: 51, name: 'Carpentry', skill_group_id: 5 },
-    { id: 52, name: 'Cooking', skill_group_id: 5 },
-    { id: 53, name: 'Fletching', skill_group_id: 5 },
-    { id: 54, name: 'Forgery', skill_group_id: 5 },
-    { id: 55, name: 'Jewelry', skill_group_id: 5 },
-    { id: 56, name: 'Mechanics', skill_group_id: 5 },
-    { id: 57, name: 'Tailoring', skill_group_id: 5 },
-  ];
+        for (const selectedSkill of updatedSkills) {
+            if (selectedSkill.skill_id === newSkill.skill_id) {
+                isSkillAlreadySelected = true;
+                break;
+            }
+        }
+
+        if (!isSkillAlreadySelected) {
+            updatedSkills.push(newSkill);
+        }
+    }
+
+    setSelectedSkills(updatedSkills);
+  };
 
   return (
     <div className="flex flex-col items-center min-h-screen">
@@ -391,25 +309,39 @@ export default function Home() {
             {selectedTab === 'ancestry' && (
               <div role="tabpanel" className="p-4 bg-slate-800 rounded-md shadow">
                 <div className="flex gap-3 pt-4 flex-wrap">
-                  {ancestryList.map((ancestry) => (
-                    <button
-                      key={ancestry}
-                      className={`btn ${
-                        selectedAncestry === ancestry ? 'btn-neutral' : ''
-                      }`}
-                      onClick={() => handleAncestryChange(ancestry)}
-                    >
-                      {ancestry}
-                    </button>
-                  ))}
+                  {ancestryList.map((ancestry) => {
+                    const key = ancestry.ancestry_id ?? ancestry.name;
+                    return (
+                      <button
+                        key={key}
+                        className={`btn ${selectedAncestry?.ancestry_id === ancestry.ancestry_id ? 'btn-neutral' : ''}`}
+                        onClick={() => handleAncestryChange(ancestry)}
+                      >
+                        {ancestry.name}
+                      </button>
+                    );
+                  })}
                 </div>
-                {selectedAncestry === 'Human' && (
+                {selectedAncestry?.ancestry_id === 2 && (
                   <div className="mt-4">
                     <HumanPage
+                      ancestry={selectedAncestry}
                       traits={traits}
                       handleTraitChange={handleTraitChange}
                       selectedAncestryTraits={selectedAncestryTraits}
                       selectedAncestryTraitsValue={selectedAncestryTraitsValue}
+                    />
+                  </div>
+                )}
+                {selectedAncestry?.ancestry_id === 1 && (
+                  <div className="mt-4">
+                    <DevilPage
+                      ancestry={selectedAncestry}
+                      traits={traits}
+                      handleTraitChange={handleTraitChange}
+                      selectedAncestryTraits={selectedAncestryTraits}
+                      selectedAncestryTraitsValue={selectedAncestryTraitsValue}
+                      handleSkillSelection={handleAncestryTabSkillSelection}
                     />
                   </div>
                 )}
@@ -442,46 +374,34 @@ export default function Home() {
                 </select>
   
                 {/* Environment Section */}
-                <div className='text-lg font-bold pb-4'>ENVIRONMENT</div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {environments.map((env) => (
-                        <EnvironmentCard
-                            key={env.id}
-                            selectedEnvironment={environment}
-                            env={env}
-                            setEnvironment={setEnvironment}
-                        />
-                    ))}
+                <div className='mb-4'>
+                  <div className='text-lg font-bold pb-4'>ENVIRONMENT</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {environments.map((env) => (
+                          <EnvironmentCard
+                              key={env.id}
+                              selectedEnvironment={environment}
+                              env={env}
+                              setEnvironment={setEnvironment}
+                          />
+                      ))}
+                  </div>
                 </div>
   
                 {/* Organization Section */}
-                {/* <div className="mb-4">
-                  <h3 className="text-lg font-semibold">Organization</h3>
-                  <div className="flex items-center gap-4 mt-2">
-                    <select
-                      className="select select-bordered w-full"
-                      value={organization?.name || ''}
-                      onChange={(e) => {
-                        const selectedOrg = organizations.find(
-                          (org) => org.name === e.target.value
-                        );
-                        setOrganization(selectedOrg || null);
-                      }}
-                    >
-                      <option value="" disabled>
-                        Select organization
-                      </option>
+                <div className='mb-4'>
+                  <div className='text-lg font-bold pb-4'>ORGANIZATION</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                       {organizations.map((org) => (
-                        <option key={org.id} value={org.name}>
-                          {org.name}
-                        </option>
+                          <OrganizationCard
+                              key={org.id}
+                              selectedOrganization={selectedOrganization}
+                              org={org}
+                              setSelectedOrganization={setSelectedOrganization}
+                          />
                       ))}
-                    </select>
-                    <p className="text-sm">
-                      {organization ? organization.description : ''}
-                    </p>
                   </div>
-                </div> */}
+                </div>
   
                 {/* Upbringing Section */}
                 {/* <div className="mb-4">

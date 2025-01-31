@@ -2,20 +2,15 @@
 
 import { useState, useEffect, FC } from 'react';
 import TraitCard from '../trait_card';
-
-type Trait = {
-    id: number;
-    name: string;
-    description: string;
-    value: number;
-    ancestry: string;
-};
+import { Trait } from '@/types/Trait';
+import { Ancestry } from '@/types/Ancestry';
   
 type HumanPageProps = {
     traits: Trait[];
     handleTraitChange: (trait: Trait) => void;
     selectedAncestryTraits: Trait[];
     selectedAncestryTraitsValue: number;
+    ancestry: Ancestry;
 }; 
 
 const HumanPage: FC<HumanPageProps> = ({traits, handleTraitChange, selectedAncestryTraits, selectedAncestryTraitsValue }) => {
@@ -26,9 +21,9 @@ const HumanPage: FC<HumanPageProps> = ({traits, handleTraitChange, selectedAnces
     }, [selectedAncestryTraitsValue]);
 
     return (
-        <div className='pt-4'>
-            <div className='text-lg font-bold pb-0'>SIGNATURE TRAIT</div>
-            <div className='divider h-0'></div>
+        <div>
+            <div className='text-lg font-bold pb-4'>SIGNATURE TRAIT</div>
+            {/* <div className='divider h-0'></div> */}
             <div className="card bg-slate-500 text-primary-content mb-4">
                 <div className="card-body">
                     <h2 className="card-title">DETECT THE SUPERNATURAL</h2>
@@ -45,12 +40,12 @@ const HumanPage: FC<HumanPageProps> = ({traits, handleTraitChange, selectedAnces
                 </div>
             </div>
             <div className="text-lg font-bold pb-0">PURCHASED TRAITS</div>
-            <div className='divider h-0'></div>
+            {/* <div className='divider h-0'></div> */}
             <div>
                 You have {remainingPoints} points left to spend.
                 {traits.map((trait) => (
                     <TraitCard
-                        key={trait.id}
+                        key={trait.trait_id}
                         trait={trait}
                         handleTraitChange={handleTraitChange}
                         selectedAncestryTraits={selectedAncestryTraits}
