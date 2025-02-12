@@ -8,11 +8,12 @@ import { Ancestry } from '@/types/Ancestry';
 
 type DevilPageProps = {
     ancestry: Ancestry;
+    devilSkill: Skill | null;
     traits: Trait[];
     handleTraitChange: (trait: Trait) => void;
     selectedAncestryTraits: Trait[];
     selectedAncestryTraitsValue: number;
-    handleSkillSelection: (skills: Skill[]) => void;
+    handleDevilSkillSelection: (skill: Skill) => void;
 };
 
 const DevilPage: FC<DevilPageProps> = ({
@@ -20,19 +21,16 @@ const DevilPage: FC<DevilPageProps> = ({
     handleTraitChange,
     selectedAncestryTraits,
     selectedAncestryTraitsValue,
-    handleSkillSelection,
+    handleDevilSkillSelection,
+    devilSkill
 }) => {
     const [remainingPoints, setRemainingPoints] = useState<number>(3);
     const [skills, setSkills] = useState<Skill[]>([]);
-    const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
 
     const handleSelectionChange = (skillName: string) => {
         const selectedSkill = skills.find((skill) => skill.name === skillName);
-        
-        if (selectedSkill && !selectedSkills.includes(selectedSkill)) {
-            const updatedSkills = [...selectedSkills, selectedSkill];
-            setSelectedSkills(updatedSkills);
-            handleSkillSelection(updatedSkills);
+        if (selectedSkill) {
+            handleDevilSkillSelection(selectedSkill);
         }
     };
 
@@ -59,6 +57,18 @@ const DevilPage: FC<DevilPageProps> = ({
         fetchSkills();
     }, []);
 
+    const sortTraits = (traits: Trait[]) => {
+        const sortedTraits = traits.sort((a, b) => {
+            if (a.cost !== b.cost) {
+                return a.cost - b.cost;
+            }
+        
+            return a.name.localeCompare(b.name);
+        });
+
+        return sortedTraits
+    }
+
     return (
         <div>
             <div className='text-lg font-bold pb-4'>SIGNATURE TRAIT</div>
@@ -74,7 +84,7 @@ const DevilPage: FC<DevilPageProps> = ({
                     </div>
                     <select
                         className="select select-accent w-full max-w-xs text-white"
-                        value={selection?.name || ''}
+                        value={devilSkill?.name || ''}
                         onChange={(e) => handleSelectionChange(e.target.value)}
                     >
                         <option value="" disabled>
@@ -91,7 +101,7 @@ const DevilPage: FC<DevilPageProps> = ({
             <div className="text-lg font-bold pb-0">PURCHASED TRAITS</div>
             <div>
                 You have {remainingPoints} points left to spend.
-                {traits.map((trait) => (
+                {sortTraits(traits).map((trait) => (
                     <TraitCard
                         key={trait.trait_id}
                         trait={trait}

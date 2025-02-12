@@ -8,6 +8,7 @@ import { Ancestry } from '@/types/Ancestry';
 import { Trait } from '@/types/Trait';
 import DevilPage from './components/ancestry_forms/devil';
 import { Skill } from '@/types/Skill';
+import DragonKnightPage from './components/ancestry_forms/dragon_knight';
 
 type Language = {
   id: number;
@@ -258,24 +259,10 @@ export default function Home() {
     setSelectedTab(tabName);
   };
 
-  const handleAncestryTabSkillSelection = (skills: Skill[]) => {
-    const updatedSkills = [...selectedSkills];
-    for (const newSkill of skills) {
-        let isSkillAlreadySelected = false;
+  const [devilSkill, setDevilSkill] = useState<Skill | null>(null);
 
-        for (const selectedSkill of updatedSkills) {
-            if (selectedSkill.skill_id === newSkill.skill_id) {
-                isSkillAlreadySelected = true;
-                break;
-            }
-        }
-
-        if (!isSkillAlreadySelected) {
-            updatedSkills.push(newSkill);
-        }
-    }
-
-    setSelectedSkills(updatedSkills);
+  const handleDevilSkillSelection = (skill: Skill) => {
+      setDevilSkill(skill);
   };
 
   return (
@@ -322,17 +309,6 @@ export default function Home() {
                     );
                   })}
                 </div>
-                {selectedAncestry?.ancestry_id === 2 && (
-                  <div className="mt-4">
-                    <HumanPage
-                      ancestry={selectedAncestry}
-                      traits={traits}
-                      handleTraitChange={handleTraitChange}
-                      selectedAncestryTraits={selectedAncestryTraits}
-                      selectedAncestryTraitsValue={selectedAncestryTraitsValue}
-                    />
-                  </div>
-                )}
                 {selectedAncestry?.ancestry_id === 1 && (
                   <div className="mt-4">
                     <DevilPage
@@ -341,7 +317,30 @@ export default function Home() {
                       handleTraitChange={handleTraitChange}
                       selectedAncestryTraits={selectedAncestryTraits}
                       selectedAncestryTraitsValue={selectedAncestryTraitsValue}
-                      handleSkillSelection={handleAncestryTabSkillSelection}
+                      handleDevilSkillSelection={handleDevilSkillSelection}
+                      devilSkill={devilSkill}
+                      />
+                  </div>
+                )}
+                {selectedAncestry?.ancestry_id === 2 && (
+                  <div className="mt-4">
+                    <DragonKnightPage
+                      ancestry={selectedAncestry}
+                      traits={traits}
+                      handleTraitChange={handleTraitChange}
+                      selectedAncestryTraits={selectedAncestryTraits}
+                      selectedAncestryTraitsValue={selectedAncestryTraitsValue}
+                    />
+                  </div>
+                )}
+                {selectedAncestry?.ancestry_id === 8 && (
+                  <div className="mt-4">
+                    <HumanPage
+                      ancestry={selectedAncestry}
+                      traits={traits}
+                      handleTraitChange={handleTraitChange}
+                      selectedAncestryTraits={selectedAncestryTraits}
+                      selectedAncestryTraitsValue={selectedAncestryTraitsValue}
                     />
                   </div>
                 )}
