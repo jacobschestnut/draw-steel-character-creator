@@ -4,6 +4,8 @@ import { useState, useEffect, FC } from 'react';
 import TraitCard from '../trait_card';
 import { Trait } from '@/types/Trait';
 import { Ancestry } from '@/types/Ancestry';
+import traitCardMap from '../trait_cards/dragon_knight';
+import DefaultTraitCard from '../trait_cards/default';
   
 type HumanPageProps = {
     traits: Trait[];
@@ -11,9 +13,10 @@ type HumanPageProps = {
     selectedAncestryTraits: Trait[];
     selectedAncestryTraitsValue: number;
     ancestry: Ancestry;
+    clearTraits: () => void;
 }; 
 
-const HumanPage: FC<HumanPageProps> = ({traits, handleTraitChange, selectedAncestryTraits, selectedAncestryTraitsValue }) => {
+const HumanPage: FC<HumanPageProps> = ({traits, handleTraitChange, selectedAncestryTraits, selectedAncestryTraitsValue, clearTraits }) => {
     const [remainingPoints, setRemainingPoints] = useState<number>(3);
 
     useEffect(() => {
@@ -42,15 +45,26 @@ const HumanPage: FC<HumanPageProps> = ({traits, handleTraitChange, selectedAnces
             <div className="text-lg font-bold pb-0">PURCHASED TRAITS</div>
             {/* <div className='divider h-0'></div> */}
             <div>
-                You have {remainingPoints} points left to spend.
-                {traits.map((trait) => (
-                    <TraitCard
-                        key={trait.trait_id}
-                        trait={trait}
-                        handleTraitChange={handleTraitChange}
-                        selectedAncestryTraits={selectedAncestryTraits}
-                    />
-                ))}
+            You have {remainingPoints} points left to spend.
+                <button 
+                    className="btn ml-4"
+                    onClick={() => clearTraits()}
+                >
+                    Clear
+                </button>
+                {
+                    traits.map((trait) => {
+                        const TraitComponent = traitCardMap[trait.name] || DefaultTraitCard
+                        return (
+                            <TraitComponent
+                                key={trait.trait_id}
+                                trait={trait}
+                                handleTraitChange={handleTraitChange}
+                                selectedAncestryTraits={selectedAncestryTraits}
+                            />
+                        )
+                    })
+                }
             </div>
         </div>
   );

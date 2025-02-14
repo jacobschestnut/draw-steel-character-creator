@@ -85,6 +85,11 @@ export default function Home() {
 
   const [selectedAncestryTraitsValue, setSelectedAncestryTraitsValue] = useState<number>(0);
 
+  const clearTraits = () => {
+    setSelectedAncestryTraits([]);
+    setSelectedAncestryTraitsValue(0);
+  }
+
   const handleAncestryChange = (ancestry: Ancestry) => {
     setSelectedAncestry(ancestry);
   };  
@@ -319,6 +324,7 @@ export default function Home() {
                       selectedAncestryTraitsValue={selectedAncestryTraitsValue}
                       handleDevilSkillSelection={handleDevilSkillSelection}
                       devilSkill={devilSkill}
+                      clearTraits={clearTraits}
                       />
                   </div>
                 )}
@@ -330,6 +336,7 @@ export default function Home() {
                       handleTraitChange={handleTraitChange}
                       selectedAncestryTraits={selectedAncestryTraits}
                       selectedAncestryTraitsValue={selectedAncestryTraitsValue}
+                      clearTraits={clearTraits}
                     />
                   </div>
                 )}
@@ -341,6 +348,7 @@ export default function Home() {
                       handleTraitChange={handleTraitChange}
                       selectedAncestryTraits={selectedAncestryTraits}
                       selectedAncestryTraitsValue={selectedAncestryTraitsValue}
+                      clearTraits={clearTraits}
                     />
                   </div>
                 )}
